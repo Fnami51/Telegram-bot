@@ -1,6 +1,6 @@
 const config = {
     port: 3000,
-    token: '',
+    token: '7418821391:AAE52at5DOpSBGZradRGIJBFjGilEihr1cs',
     directusUrl: 'https://',
     directusToken: ''
 }
