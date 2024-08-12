@@ -12,8 +12,8 @@ const directusUrl = process.env.DIRECTUS_URL;
 const email = process.env.DIRECTUS_EMAIL;
 const password = process.env.DIRECTUS_PASSWORD;
 
-if (!token) {
-  throw new Error('Токен Telegram-Bot не найден');
+if (!process.env) {
+  throw new Error('Не найден конфигурирующий файл .env');
 }
 
 const bot = new TelegramBot(token, { polling: true });
@@ -22,7 +22,7 @@ let users = [];
 
 const app = express();
 app.listen(port, () => {
-  console.info(`Сервер запущен на порту ${port}`);
+  console.info(`Сервер запущен => port:${port}`);
 });
 
 const startApp = (function () {
@@ -37,7 +37,6 @@ const startApp = (function () {
         cachedDirectusToken = await getToken(directusUrl, email, password);
         const usersFromDirectus = await loadUsers(directusUrl, cachedDirectusToken);
         users = usersFromDirectus.map(user => user.chat_id);
-        console.info(`Пользователи: ${users}`);
 
         isFirstStart = true;
         return cachedDirectusToken;
@@ -56,7 +55,6 @@ startApp().then(() => {
       await saveUser(directusUrl, directusToken, chatId, username);
     }
 
-    console.log('chatId = ', chatId, '. Username = ', username);
     bot.sendMessage(chatId, 'Бот добавлен');
   });
 
@@ -106,11 +104,11 @@ startApp().then(() => {
         const statistic = await getStatistics(directusUrl, directusToken, messageId);
         
         bot.sendMessage(msg.chat.id, 
-            `Статистика сообщения:\n👍 Лайков: ${statistic.likes}\n👎 Дизлайков: ${statistic.dislikes}`,
+            `Статистика сообщения:\n${messageId}\n👍 Лайков: ${statistic.likes}\n👎 Дизлайков: ${statistic.dislikes}`, //\n${messageId} для отладки, удали потом
             { reply_to_message_id: msg.reply_to_message.message_id } 
         );
     } else {
         bot.sendMessage(msg.chat.id, "Пожалуйста, используйте команду '/stat' в ответе на сообщение.");
     }
-});
+  });
 });

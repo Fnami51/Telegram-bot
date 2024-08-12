@@ -20,11 +20,13 @@ async function saveReaction(url, token, messageId, userId, reaction) {
       const response = await axios.get(
         `${url}/items/nazar_reactions`,
         {
-          headers: { Authorization: `Bearer ${token}` },
-          params: { filter: { message_id: { _eq: messageId } } }
+          headers: { Authorization: `Bearer ${token}` }
         }
       );
-      const reactions = response.data.data;
+      const reactions = response.data.data.filter((item) => item.message_id === messageId);
+
+      console.log(reactions)
+
       const likes = reactions.filter(r => r.reaction === 'like').length;
       const dislikes = reactions.filter(r => r.reaction === 'dislike').length;
       return { likes, dislikes };
