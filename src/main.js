@@ -98,7 +98,7 @@ startApp().then(() => {
     }
   });
 
-  bot.onText(/\/statistic/i, async (msg) => {
+  bot.onText(/\/stat/i, async (msg) => {
     if (msg.reply_to_message) {
         const messageId = msg.reply_to_message.message_id; 
         const directusToken = await startApp(); 
@@ -110,7 +110,7 @@ startApp().then(() => {
             { reply_to_message_id: msg.reply_to_message.message_id } 
         );
     } else {
-        bot.sendMessage(msg.chat.id, "Пожалуйста, используйте команду 'статистика' в ответе на сообщение.");
+        bot.sendMessage(msg.chat.id, "Пожалуйста, используйте команду '/stat' в ответе на сообщение.");
     }
 });
 });
