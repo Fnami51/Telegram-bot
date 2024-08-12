@@ -4,7 +4,8 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon src/main.js",
-    "start": "node src/main.js"
+    "start": "node src/main.js",
+    "lint": "npx eslint . --fix"
   },
   "keywords": [],
   "author": "FNM51",
@@ -17,6 +18,8 @@
     "node-telegram-bot-api": "^0.66.0"
   },
   "devDependencies": {
+    "eslint": "^9.9.0",
+    "globals": "^15.9.0",
     "nodemon": "^3.1.4"
   }
 }

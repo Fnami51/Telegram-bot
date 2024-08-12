@@ -19,7 +19,6 @@ if (!process.env) {
 const bot = new TelegramBot(token, { polling: true });
 
 let users = [];
-const mapId = {}; //Не самое лучшие решение. Лучше добавить пару ячеик в коллекции message
 
 const app = express();
 app.listen(port, () => {
@@ -27,21 +26,21 @@ app.listen(port, () => {
 });
 
 const startApp = (function () {
-    let cachedDirectusToken = null;
-    let isFirstStart = false;
+  let cachedDirectusToken = null;
+  let isFirstStart = false;
 
-    return async function () {
-        if (isFirstStart) {
-            return cachedDirectusToken;
-        }
+  return async function () {
+    if (isFirstStart) {
+      return cachedDirectusToken;
+    }
 
-        cachedDirectusToken = await getToken(directusUrl, email, password);
-        const usersFromDirectus = await loadUsers(directusUrl, cachedDirectusToken);
-        users = usersFromDirectus.map(user => user.chat_id);
+    cachedDirectusToken = await getToken(directusUrl, email, password);
+    const usersFromDirectus = await loadUsers(directusUrl, cachedDirectusToken);
+    users = usersFromDirectus.map(user => user.chat_id);
 
-        isFirstStart = true;
-        return cachedDirectusToken;
-    };
+    isFirstStart = true;
+    return cachedDirectusToken;
+  };
 })();
 
 startApp().then(() => {
@@ -62,11 +61,11 @@ startApp().then(() => {
   bot.on('message', async (msg) => {
     const chatId = msg.chat.id;
     const text = msg.text;
+    const numberMessage = msg.message_id;
 
     if (!text.startsWith('/')) {
       const directusToken = await startApp(); 
-      const messageId = await saveMessage(directusUrl, directusToken, text);
-      mapId[msg.message_id] = { chatId, messageId };
+      const messageId = await saveMessage(directusUrl, directusToken, text, chatId, numberMessage);
 
       users.forEach(async (userId) => {
         if (userId !== chatId) {
@@ -100,18 +99,27 @@ startApp().then(() => {
 
   bot.onText(/\/stat/i, async (msg) => {
     if (msg.reply_to_message) {
-        const messageNumber = msg.reply_to_message.message_id; 
-        const messageId = mapId[messageNumber].messageId
-        const directusToken = await startApp(); 
+      const chatId = msg.chat.id;
+      const replyId = msg.reply_to_message.message_id; 
 
-        const statistic = await getStatistics(directusUrl, directusToken, messageId);
-        
-        bot.sendMessage(msg.chat.id, 
-            `Статистика сообщения:\n👍 Лайков: ${statistic.likes}\n👎 Дизлайков: ${statistic.dislikes}`,
-            { reply_to_message_id: msg.reply_to_message.message_id } 
+      const directusToken = await startApp(); 
+
+      const messages = await getMessages(directusUrl, directusToken);
+      console.log(messages);
+      const message = messages.find(message => Number(message.number) === replyId && Number(message.chat_ID) === chatId);
+
+      if (message) {
+        const statistic = await getStatistics(directusUrl, directusToken, message.id);
+            
+        bot.sendMessage(chatId, 
+          `Статистика сообщения:\n👍 Лайков: ${statistic.likes}\n👎 Дизлайков: ${statistic.dislikes}`,
+          { reply_to_message_id: replyId } 
         );
+      } else {
+        bot.sendMessage(chatId, "Сообщение не найдено в базе данных.");
+      }
     } else {
-        bot.sendMessage(msg.chat.id, "Пожалуйста, используйте команду '/stat' в ответе на сообщение.");
+      bot.sendMessage(msg.chat.id, "Пожалуйста, используйте команду '/stat' в ответе на сообщение.");
     }
   });
 });

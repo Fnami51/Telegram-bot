@@ -1,10 +1,12 @@
 const axios = require('axios');
 
-async function saveMessage(url, token, text) {
+async function saveMessage(url, token, text, chat_ID, number) {
   try {
     const response = await axios.post(
       `${url}/items/nazar_messages`,
-      { text, },
+      { text, 
+        chat_ID, 
+        number},
       {
         headers: { Authorization: `Bearer ${token}` }
       }
@@ -15,7 +17,7 @@ async function saveMessage(url, token, text) {
   }
 }
 
-async function getMessages(url, token, text) {
+async function getMessages(url, token) {
   try {
     const response = await axios.get(
       `${url}/items/nazar_messages`,
@@ -29,4 +31,4 @@ async function getMessages(url, token, text) {
   }
 }
 
-module.exports = {saveMessage, getMessages}
+module.exports = {saveMessage, getMessages};
