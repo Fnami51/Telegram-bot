@@ -4,7 +4,7 @@ async function saveMessage(url, token, text) {
   try {
     const response = await axios.post(
       `${url}/items/nazar_messages`,
-      { text },
+      { text, },
       {
         headers: { Authorization: `Bearer ${token}` }
       }

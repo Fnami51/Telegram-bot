@@ -25,8 +25,6 @@ async function saveReaction(url, token, messageId, userId, reaction) {
       );
       const reactions = response.data.data.filter((item) => item.message_id === messageId);
 
-      console.log(reactions)
-
       const likes = reactions.filter(r => r.reaction === 'like').length;
       const dislikes = reactions.filter(r => r.reaction === 'dislike').length;
       return { likes, dislikes };

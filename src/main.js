@@ -19,6 +19,7 @@ if (!process.env) {
 const bot = new TelegramBot(token, { polling: true });
 
 let users = [];
+const mapId = {}; //Не самое лучшие решение. Лучше добавить пару ячеик в коллекции message
 
 const app = express();
 app.listen(port, () => {
@@ -65,6 +66,7 @@ startApp().then(() => {
     if (!text.startsWith('/')) {
       const directusToken = await startApp(); 
       const messageId = await saveMessage(directusUrl, directusToken, text);
+      mapId[msg.message_id] = { chatId, messageId };
 
       users.forEach(async (userId) => {
         if (userId !== chatId) {
@@ -98,13 +100,14 @@ startApp().then(() => {
 
   bot.onText(/\/stat/i, async (msg) => {
     if (msg.reply_to_message) {
-        const messageId = msg.reply_to_message.message_id; 
+        const messageNumber = msg.reply_to_message.message_id; 
+        const messageId = mapId[messageNumber].messageId
         const directusToken = await startApp(); 
 
         const statistic = await getStatistics(directusUrl, directusToken, messageId);
         
         bot.sendMessage(msg.chat.id, 
-            `Статистика сообщения:\n${messageId}\n👍 Лайков: ${statistic.likes}\n👎 Дизлайков: ${statistic.dislikes}`, //\n${messageId} для отладки, удали потом
+            `Статистика сообщения:\n👍 Лайков: ${statistic.likes}\n👎 Дизлайков: ${statistic.dislikes}`,
             { reply_to_message_id: msg.reply_to_message.message_id } 
         );
     } else {
