@@ -105,7 +105,6 @@ startApp().then(() => {
       const directusToken = await startApp(); 
 
       const messages = await getMessages(directusUrl, directusToken);
-      console.log(messages);
       const message = messages.find(message => Number(message.number) === replyId && Number(message.chat_ID) === chatId);
 
       if (message) {
