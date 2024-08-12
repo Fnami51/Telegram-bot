@@ -15,4 +15,18 @@ async function saveMessage(url, token, text) {
   }
 }
 
-module.exports = saveMessage
+async function getMessages(url, token, text) {
+  try {
+    const response = await axios.get(
+      `${url}/items/nazar_messages`,
+      {
+        headers: { Authorization: `Bearer ${token}` }
+      }
+    );
+    return response.data.data;
+  } catch (error) {
+    console.error('Ошибка получения сообщений в Directus: ', error);
+  }
+}
+
+module.exports = {saveMessage, getMessages}

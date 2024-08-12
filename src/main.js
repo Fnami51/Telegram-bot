@@ -2,7 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const TelegramBot = require('node-telegram-bot-api');
 const {loadUsers, saveUser} = require('./directus/users');
-const saveMessage = require('./directus/message');
+const {saveMessage, getMessages} = require('./directus/message');
 const { getStatistics, saveReaction } = require('./directus/reactions');
 const getToken = require('./directus/token');
 
